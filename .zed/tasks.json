@@ -1,0 +1,20 @@
+[
+	{
+		"label": "r/go",
+		"command": "go",
+		"args": ["run", "$ZED_FILE"],
+		"use_new_terminal": false,
+		"allow_concurrent_runs": true,
+	},
+	{
+		"label": "t/go",
+		"command": "pwsh",
+		"args": [
+			"-NoProfile",
+			"-Command",
+			"go test (Split-Path \"$ZED_FILE\")",
+		],
+		"use_new_terminal": false,
+		"allow_concurrent_runs": true,
+	},
+]
