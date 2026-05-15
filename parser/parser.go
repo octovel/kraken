@@ -2,6 +2,7 @@ package parser
 
 import (
 	"fmt"
+	"os"
 )
 
 type Parser struct {
@@ -11,11 +12,18 @@ type Parser struct {
 type Result struct{}
 
 func (p *Parser) Parse(args []string) (*Result, error) {
-	if p.Options.MinimumInputs != -1 && len(args) < p.Options.MinimumInputs {
-		return nil, fmt.Errorf("too few arguments (expected %d, got %d)", p.Options.MinimumInputs, len(args))
+	_args := args
+	if p.Options.HandleExecutableArgument {
+		if len(_args) != 0 && _args[0] == os.Args[0] {
+			_args = args[1:]
+		}
 	}
-	if p.Options.MaximumInputs != -1 && len(args) > p.Options.MaximumInputs {
-		return nil, fmt.Errorf("too many arguments (expected %d, got %d)", p.Options.MaximumInputs, len(args))
+	fmt.Println(_args)
+	if p.Options.MinimumInputs != -1 && len(_args) < p.Options.MinimumInputs {
+		return nil, fmt.Errorf("too few arguments (expected %d, got %d)", p.Options.MinimumInputs, len(_args))
+	}
+	if p.Options.MaximumInputs != -1 && len(_args) > p.Options.MaximumInputs {
+		return nil, fmt.Errorf("too many arguments (expected %d, got %d)", p.Options.MaximumInputs, len(_args))
 	}
 
 	if p.Options.ErrorOnNoCommand && len(args) == 0 {
@@ -26,11 +34,12 @@ func (p *Parser) Parse(args []string) (*Result, error) {
 }
 
 type Options struct {
-	FlagPrefixes            []string
-	ValueDelimiters         []string
-	AllowStandaloneValues   bool
-	EnableGroupedShortFlags bool
-	EnableDoubleDashStop    bool
+	FlagPrefixes             []string
+	ValueDelimiters          []string
+	AllowStandaloneValues    bool
+	HandleExecutableArgument bool
+	EnableGroupedShortFlags  bool
+	EnableDoubleDashStop     bool
 
 	MaximumTokenLength int
 
@@ -83,15 +92,16 @@ func New(options *Options) *Parser {
 
 func DefaultSettings() *Options {
 	return &Options{
-		FlagPrefixes:          []string{"--"},
-		ValueDelimiters:       []string{"="},
-		AllowStandaloneValues: true,
-		MaximumTokenLength:    -1,
-		MaximumFlags:          -1,
-		MinimumFlags:          -1,
-		MaximumInputs:         -1,
-		MinimumInputs:         -1,
-		MaximumArguments:      -1,
-		MinimumArguments:      -1,
+		FlagPrefixes:             []string{"--"},
+		ValueDelimiters:          []string{"="},
+		AllowStandaloneValues:    true,
+		HandleExecutableArgument: true,
+		MaximumTokenLength:       -1,
+		MaximumFlags:             -1,
+		MinimumFlags:             -1,
+		MaximumInputs:            -1,
+		MinimumInputs:            -1,
+		MaximumArguments:         -1,
+		MinimumArguments:         -1,
 	}
 }
